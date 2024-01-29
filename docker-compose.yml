@@ -1,0 +1,27 @@
+version: "3.0"
+services:
+  app:
+    environment:
+      - TZ=Europe/Warsaw
+    build: ./docker
+    ports:
+      - "8631:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/apache/sites-enabled:/etc/apache2/sites-enabled
+      - ./docker/apache/logs:/var/log/apache2/
+    links:
+      - app_mysql:mysql
+  app_mysql:
+    image: mysql:8.0
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3337:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=drupal_app_db
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf
